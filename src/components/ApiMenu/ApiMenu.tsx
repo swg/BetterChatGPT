@@ -20,10 +20,13 @@ const ApiMenu = ({
   const apiKey = useStore((state) => state.apiKey);
   const setApiKey = useStore((state) => state.setApiKey);
   const apiEndpoint = useStore((state) => state.apiEndpoint);
+  const maxTokens = useStore((state) => state.maxTokens);
+  const setMaxTokens = useStore((state) => state.setMaxTokens);
   const setApiEndpoint = useStore((state) => state.setApiEndpoint);
 
   const [_apiKey, _setApiKey] = useState<string>(apiKey || '');
   const [_apiEndpoint, _setApiEndpoint] = useState<string>(apiEndpoint);
+  const [_maxTokens, _setMaxTokens] = useState<number>(maxTokens);
   const [_customEndpoint, _setCustomEndpoint] = useState<boolean>(
     !availableEndpoints.includes(apiEndpoint)
   );
@@ -31,6 +34,7 @@ const ApiMenu = ({
   const handleSave = () => {
     setApiKey(_apiKey);
     setApiEndpoint(_apiEndpoint);
+    setMaxTokens(_maxTokens);
     setIsModalOpen(false);
   };
 
@@ -77,6 +81,24 @@ const ApiMenu = ({
             />
           )}
         </div>
+
+        {_customEndpoint ? (
+          <div className='flex gap-2 items-center mb-6'>
+            <div className='min-w-fit text-gray-900 dark:text-gray-300 text-sm'>
+              {t('maxTokens.inputLabel', { ns: 'api' })}
+            </div>
+            <input
+              type='number'
+              className='text-gray-800 dark:text-white p-3 text-sm border-none bg-gray-200 dark:bg-gray-600 rounded-md m-0 w-full mr-0 h-8 focus:outline-none'
+              value={_maxTokens}
+              onChange={(e) => {
+                _setMaxTokens(Number(e.target.value));
+              }}
+            />
+          </div>
+        ) : (
+          <></>
+        )}
 
         <div className='flex gap-2 items-center justify-center mt-2'>
           <div className='min-w-fit text-gray-900 dark:text-gray-300 text-sm'>

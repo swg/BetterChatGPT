@@ -5,7 +5,7 @@ import { ChatInterface, MessageInterface } from '@type/chat';
 import { getChatCompletion, getChatCompletionStream } from '@api/api';
 import { parseEventSource } from '@api/helper';
 import { limitMessageTokens, updateTotalTokenUsed } from '@utils/messageUtils';
-import { _defaultChatConfig } from '@constants/chat';
+import { _defaultChatConfig, modelMaxToken } from '@constants/chat';
 import { officialAPIEndpoint } from '@constants/auth';
 
 const useSubmit = () => {
@@ -66,11 +66,20 @@ const useSubmit = () => {
       if (chats[currentChatIndex].messages.length === 0)
         throw new Error('No messages submitted!');
 
+      let maxTokens;
+
+      if (apiEndpoint === officialAPIEndpoint) {
+        maxTokens = modelMaxToken[chats[currentChatIndex].config.model]
+      } else {
+        maxTokens = useStore.getState().maxTokens
+      }
+
       const messages = limitMessageTokens(
         chats[currentChatIndex].messages,
-        chats[currentChatIndex].config.max_tokens,
+        maxTokens,
         chats[currentChatIndex].config.model
       );
+
       if (messages.length === 0) throw new Error('Message exceed max token!');
 
       // no api key (free)

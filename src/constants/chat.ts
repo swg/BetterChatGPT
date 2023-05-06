@@ -28,6 +28,8 @@ export const modelOptions: ModelOptions[] = [
 
 export const defaultModel = 'gpt-3.5-turbo';
 
+export const customMaxTokens = 3000;
+
 export const modelMaxToken = {
   'gpt-3.5-turbo': 4096,
   'gpt-3.5-turbo-0301': 4096,

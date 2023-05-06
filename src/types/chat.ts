@@ -141,9 +141,14 @@ export interface LocalStorageInterfaceV6ToV7 {
   hideSideMenu: boolean;
 }
 
-export interface LocalStorageInterfaceV7oV8
+export interface LocalStorageInterfaceV7ToV8
   extends LocalStorageInterfaceV6ToV7 {
   foldersName: string[];
   foldersExpanded: boolean[];
   folders: FolderCollection;
+}
+
+export interface LocalStorageInterfaceV8ToV9
+  extends LocalStorageInterfaceV7ToV8 {
+  maxTokens?: number,
 }
