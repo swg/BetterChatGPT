@@ -47,30 +47,46 @@ const useSubmit = () => {
     return data.choices[0].message.content;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (
+    regeneration: boolean = false,
+    originalMessages: MessageInterface[] = []
+  ) => {
     const chats = useStore.getState().chats;
     if (generating || !chats) return;
 
     const updatedChats: ChatInterface[] = JSON.parse(JSON.stringify(chats));
+    const tempMessages = updatedChats[currentChatIndex].messages;
 
-    updatedChats[currentChatIndex].messages.push({
-      role: 'assistant',
-      content: '',
-    });
+    if (regeneration) {
+      let temp = tempMessages[tempMessages.length - 1];
+      const previous: string[] = temp.versions ? temp.versions : [];
+      temp.versions = [...previous, temp.content];
+      temp.content = '';
+      temp.versionIndex = previous.length;
+      tempMessages[tempMessages.length - 1] = temp;
+    } else {
+      tempMessages.push({
+        role: 'assistant',
+        content: '',
+        versions: [],
+        // versionIndex: 0,
+      });
+    }
 
     setChats(updatedChats);
     setGenerating(true);
 
     try {
       let stream;
-      if (chats[currentChatIndex].messages.length === 0)
+      if (updatedChats[currentChatIndex].messages.length === 0)
         throw new Error('No messages submitted!');
 
       const messages = limitMessageTokens(
-        chats[currentChatIndex].messages,
-        chats[currentChatIndex].config.max_tokens,
-        chats[currentChatIndex].config.model
+        updatedChats[currentChatIndex].messages,
+        updatedChats[currentChatIndex].config.max_tokens,
+        updatedChats[currentChatIndex].config.model
       );
+
       if (messages.length === 0) throw new Error('Message exceed max token!');
 
       // no api key (free)
@@ -196,7 +212,16 @@ const useSubmit = () => {
       const err = (e as Error).message;
       console.log(err);
       setError(err);
+
+      if (regeneration && originalMessages.length) {
+        updatedChats[currentChatIndex].messages = originalMessages;
+      } else {
+        updatedChats[currentChatIndex].messages.pop();
+      }
+
+      setChats(updatedChats);
     }
+
     setGenerating(false);
   };
 

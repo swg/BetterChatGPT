@@ -69,6 +69,8 @@ const ChatContent = () => {
                   role={message.role}
                   content={message.content}
                   messageIndex={index}
+                  versions={message.versions}
+                  versionIndex={message.versionIndex}
                 />
                 {!generating && advancedMode && <NewMessageButton messageIndex={index} />}
               </React.Fragment>
